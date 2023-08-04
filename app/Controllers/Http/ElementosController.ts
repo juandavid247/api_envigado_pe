@@ -2,28 +2,30 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 
 export default class ElementosController {
-  public async index({}: HttpContextContract) {
-    let sql = `select
-    s.id_solicitud_publicidad,
-    s.numero_oficio,
-    s.numero_radicado,
-    to_char(s.fecha_oficio,'yyyy-mm-dd') fecha_oficio,
-    to_char(s.fecha_radicado,'yyyy-mm-dd') fecha_radicado,
-    s.empresa_cliente,
-    s.identificacion_cliente,
-    case
-      when s.estado = 1 then 'inactivo'
-      when s.estado = 2 then 'desmontado'
-      else 'activo'
-    end as estado
-  from envii.pe_solicitud s
-    join (select min(e.fecha_fin) fecha_fin, e.id_solicitud from envii.pub_ext_elemento e group by e.id_solicitud) e on (s.id_solicitud_publicidad = e.id_solicitud)
-    join (select count(*)
-   total, e2.id_solicitud from envii.pub_ext_elemento e2 group by e2.id_solicitud) e2 on (s.id_solicitud_publicidad = e2.id_solicitud)
-  where e2.total>0`
-    let result = await Database.rawQuery(sql) 
-    return result.rows
+  public async index({ request }: HttpContextContract) {
+
+    const { 
+      numero_radicado, 
+      numero_oficio,
+      fecha_oficio, 
+      fecha_radicado, 
+      identificacion_cliente,
+      page = 1, // Página por defecto es 1
+      perPage = 10, // Cantidad de resultados por página
+    } = request.all();
+    
+    let consulta = Database.from('planeacion.vw_publicidad_exterior')
+    if (numero_radicado) consulta.whereLike('numero_radicado', `%${numero_radicado}%`)
+    if (numero_oficio) consulta.whereLike('numero_oficio', `%${numero_oficio}%`)
+    if (fecha_oficio) consulta.where('fecha_oficio', '=', fecha_oficio)
+    if (fecha_radicado) consulta.where('fecha_radicado', '=', fecha_radicado)
+    if (identificacion_cliente) consulta.whereLike('identificacion_cliente', `%${identificacion_cliente}%`)
+
+    let result = await consulta.paginate(page, perPage);
+    
+    return result
   }
+  
 
   public async store({}: HttpContextContract) {}
   
