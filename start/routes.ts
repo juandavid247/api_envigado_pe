@@ -26,7 +26,9 @@ Route.group(() => {
     const report = Database.report()
     return report
   })
-  Route.resource('elemento', 'ElementosController').apiOnly()
+  Route.resource('elemento', 'ElementosController').apiOnly();
+  Route.resource('solicitud', 'SolicitudesController').apiOnly();
+
 
 }).prefix('api/v1');
 

@@ -1,5 +1,6 @@
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Database from '@ioc:Adonis/Lucid/Database'
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import Database from '@ioc:Adonis/Lucid/Database';
+
 
 export default class ElementosController {
   public async index({ request }: HttpContextContract) {
@@ -11,7 +12,7 @@ export default class ElementosController {
       fecha_radicado, 
       identificacion_cliente,
       page = 1, // Página por defecto es 1
-      perPage = 10, // Cantidad de resultados por página
+      perPage = 7, // Cantidad de resultados por página 
     } = request.all();
     
     let consulta = Database.from('planeacion.vw_publicidad_exterior')
@@ -26,14 +27,9 @@ export default class ElementosController {
     return result
   }
   
-
-  public async store({}: HttpContextContract) {}
-  
-  public async show({}: HttpContextContract) {}
-
   public async edit({}: HttpContextContract) {}
 
   public async update({}: HttpContextContract) {}
-
+  
   public async destroy({}: HttpContextContract) {}
 }
